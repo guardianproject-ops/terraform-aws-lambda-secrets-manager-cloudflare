@@ -30,7 +30,7 @@ module "cf_rotate" {
 #############################################################################
 # Cloudflare API Token
 resource "aws_secretsmanager_secret" "cf_dns_token" {
-  name = "${module.this.id}/cloudflare/dns_api_token"
+  name = "${module.this.id}/cloudflare/dns_api_token3"
   tags = module.this.tags
 }
 
@@ -52,7 +52,7 @@ resource "aws_secretsmanager_secret_version" "cf_dns_token" {
       "Policies" : [
         { "effect" : "allow",
           "permission_groups" : [
-            { "id" : "4755a26eedb94da69e1066d98aa820be","name" : "DNS Write" }
+            { "id" : "4755a26eedb94da69e1066d98aa820be", "name" : "DNS Write" }
           ],
       "resources" : { "com.cloudflare.api.account.zone.${var.zone_id}" : "*" } }],
       "ValidDays" : 7
@@ -64,7 +64,7 @@ resource "aws_secretsmanager_secret_version" "cf_dns_token" {
 # Cloudflare Tunnel Service key
 
 resource "aws_secretsmanager_secret" "cf_tunnel_service_key" {
-  name = "${module.this.id}/cloudflare/tunnel_service_key"
+  name = "${module.this.id}/cloudflare/tunnel_service_key3"
   tags = module.this.tags
 }
 
@@ -91,7 +91,7 @@ resource "aws_secretsmanager_secret_version" "cf_tunnel_service_key" {
 # Cloudflare Argo Tunnel Token
 
 resource "aws_secretsmanager_secret" "cf_argo_tunnel_token" {
-  name = "${module.this.id}/cloudflare/argo_tunnel_token2"
+  name = "${module.this.id}/cloudflare/argo_tunnel_token3"
   tags = module.this.tags
 }
 
@@ -111,7 +111,7 @@ resource "aws_secretsmanager_secret_version" "cf_argo_tunnel_token" {
     "Attributes" : {
       "Hostname" : var.hostname,
       "ValidityDays" : 7,
-      "TunnelServiceKeyArn": aws_secretsmanager_secret.cf_tunnel_service_key.arn,
+      "TunnelServiceKeyArn" : aws_secretsmanager_secret.cf_tunnel_service_key.arn,
       "ZoneId" : var.zone_id
   } })
   version_stages = ["CFINIT"]
