@@ -34,3 +34,7 @@ variable "valid_days" {
   type    = number
   default = 7
 }
+
+variable "cloudtrail_log_group_name" {
+  type = string
+}

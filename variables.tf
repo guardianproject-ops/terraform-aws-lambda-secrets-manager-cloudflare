@@ -45,3 +45,28 @@ variable "cloudwatch_log_group_arn" {
   type        = string
   description = "The ARN of the cloudwatch log group this lambda will log to"
 }
+
+variable "create_cloudwatch_log_metric" {
+  type        = bool
+  default     = true
+  description = "Whether to create cloudwatch metric for failed rotations"
+}
+
+
+variable "cloudtrail_log_group_name" {
+  type        = string
+  description = "The ARN of the log group cloudtrail events are sent to ( used when creating cloudwatch log metric )"
+  default     = ""
+}
+
+variable "cloudwatch_metric_name" {
+  type        = string
+  default     = "FailedRotations"
+  description = "The name of the cloudwatch metric"
+}
+
+variable "cloudwatch_metric_namespace" {
+  type        = string
+  default     = "SecretsManager"
+  description = "The namespace to place the metric in"
+}

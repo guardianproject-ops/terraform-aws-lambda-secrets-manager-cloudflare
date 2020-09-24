@@ -147,3 +147,27 @@ resource "aws_lambda_alias" "default" {
   function_name    = aws_lambda_function.default.function_name
   function_version = "$LATEST"
 }
+
+
+#########################################################################################
+# Cloudwatch metric
+
+module "label_cw" {
+  source     = "git::https://github.com/cloudposse/terraform-null-label.git?ref=tags/0.19.2"
+  context    = module.this.context
+  attributes = ["cw", "failed-rotations"]
+}
+
+resource "aws_cloudwatch_log_metric_filter" "this" {
+  count = var.create_cloudwatch_log_metric ? 1 : 0
+
+  name           = module.label_cw.id
+  pattern        = "{ ($.eventSource = secretsmanager.amazonaws.com) && ($.eventName = RotationFailed) }"
+  log_group_name = var.cloudtrail_log_group_name
+
+  metric_transformation {
+    name      = var.cloudwatch_metric_name
+    namespace = var.cloudwatch_metric_namespace
+    value     = 1
+  }
+}

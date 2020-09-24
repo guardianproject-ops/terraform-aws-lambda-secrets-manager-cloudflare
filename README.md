@@ -147,8 +147,12 @@ module "cf_rotate" {
 | api\_tunnel\_service\_key\_arns | A list of AWS SM Secrets containing argo tunnel service keys that this lambda could use to generate argo tunnel tokens | `list(string)` | `[]` | no |
 | attributes | Additional attributes (e.g. `1`) | `list(string)` | `[]` | no |
 | build\_number | Any time this value changes, the lambda will be rebuilt from source. The value it self has no meaning. | `string` | `"0"` | no |
+| cloudtrail\_log\_group\_name | The ARN of the log group cloudtrail events are sent to ( used when creating cloudwatch log metric ) | `string` | `""` | no |
 | cloudwatch\_log\_group\_arn | The ARN of the cloudwatch log group this lambda will log to | `string` | n/a | yes |
+| cloudwatch\_metric\_name | The name of the cloudwatch metric | `string` | `"FailedRotations"` | no |
+| cloudwatch\_metric\_namespace | The namespace to place the metric in | `string` | `"SecretsManager"` | no |
 | context | Single object for setting entire context at once.<br>See description of individual variables for details.<br>Leave string and numeric variables as `null` to use default value.<br>Individual variable settings (non-null) override settings in context object,<br>except for attributes, tags, and additional\_tag\_map, which are merged. | <pre>object({<br>    enabled             = bool<br>    namespace           = string<br>    environment         = string<br>    stage               = string<br>    name                = string<br>    delimiter           = string<br>    attributes          = list(string)<br>    tags                = map(string)<br>    additional_tag_map  = map(string)<br>    regex_replace_chars = string<br>    label_order         = list(string)<br>    id_length_limit     = number<br>  })</pre> | <pre>{<br>  "additional_tag_map": {},<br>  "attributes": [],<br>  "delimiter": null,<br>  "enabled": true,<br>  "environment": null,<br>  "id_length_limit": null,<br>  "label_order": [],<br>  "name": null,<br>  "namespace": null,<br>  "regex_replace_chars": null,<br>  "stage": null,<br>  "tags": {}<br>}</pre> | no |
+| create\_cloudwatch\_log\_metric | Whether to create cloudwatch metric for failed rotations | `bool` | `true` | no |
 | delimiter | Delimiter to be used between `namespace`, `environment`, `stage`, `name` and `attributes`.<br>Defaults to `-` (hyphen). Set to `""` to use no delimiter at all. | `string` | n/a | yes |
 | enabled | Set to false to prevent the module from creating any resources | `bool` | n/a | yes |
 | environment | Environment, e.g. 'uw2', 'us-west-2', OR 'prod', 'staging', 'dev', 'UAT' | `string` | n/a | yes |
@@ -165,6 +169,8 @@ module "cf_rotate" {
 
 | Name | Description |
 |------|-------------|
+| cloudwatch\_metric\_name | n/a |
+| cloudwatch\_metric\_namespace | n/a |
 | lambda | the lambda resource output |
 
 

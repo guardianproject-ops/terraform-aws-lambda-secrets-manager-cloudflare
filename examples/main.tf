@@ -22,9 +22,10 @@ module "cf_rotate" {
   api_origin_key         = var.api_origin_key
   api_tunnel_service_key = var.api_tunnel_service_key
 
-  cloudwatch_log_group_arn = aws_cloudwatch_log_group.lambda.arn
-  secret_prefix            = "${module.this.id}/cloudflare/*"
-  context                  = module.this.context
+  cloudwatch_log_group_arn  = aws_cloudwatch_log_group.lambda.arn
+  cloudtrail_log_group_name = var.cloudtrail_log_group_name
+  secret_prefix             = "${module.this.id}/cloudflare/*"
+  context                   = module.this.context
 }
 
 #############################################################################
