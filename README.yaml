@@ -1,0 +1,79 @@
+---
+#
+# This is the canonical configuration for the `README.md`
+# Run `make readme` to rebuild the `README.md`
+#
+
+# Name of this project
+name: terraform-aws-lambda-secrets-manager-cloudflare
+
+# License of this project
+license: "AGPL3"
+
+# Canonical GitLab repo
+gitlab_repo: guardianproject-ops/terraform-aws-lambda-secrets-manager-cloudflare
+
+# Badges to display
+badges: []
+
+# Short description of this project
+description: |-
+  This is a terraform module that creates a lambda function that rotates Cloudflare secrets stored in AWS Secrets Manager.
+
+introduction: |-
+
+  The provided lambda can rotate these types of cloudflare secrets:
+
+  1. api tokens - Rotate API tokens with granular permissions (tokens are visible at https://dash.cloudflare.com/profile/api-tokens)
+  2. tunnel service keys - Rotate tunnel service keys using a non-public API. NOTE: currently there is no way to expire or revoke a service key.
+  3. argo tunnel tokens - Creates and rotates the certfiles you need to pass cloudflared for setting up an Argo tunnel. More information on the structure of this file
+     [here](https://developers.cloudflare.com/argo-tunnel/faq#what-causes-tunnels-to-fail-to-authenticate)
+
+  One lambda can manage multiple AWS Secrets Manager (SM) Secrets.
+
+  Each AWS SM Secret can only wrap one of the above secret types.
+
+  Each type of secret needs a different credential for the lambda to
+  authenticate it self to Cloudflare.
+
+  1. api tokens - requires an api token with the User.API Tokens permission
+  2. tunnel serivce keys - requires the full Global API Key and account email address
+  3. argo tunnel tokens - requires a tunnel service key and the Origin CA Key
+                          the tunnel service key is accepted as an environment variable or optionally as an ARN to another AWS SM Secret that contains the tunnel service key
+
+  This module does not provision the aws secrets manager secrets resource.
+
+# How to use this project
+usage: |-
+
+  ```hcl
+  module "cf_rotate" {
+    source          = "git::https://gitlab.com/guardianproject-ops/terraform-aws-lambda-secrets-manager-cloudflare.git?ref=master"
+
+    # only necessary to pass the credentials needed for the secrets that this lambda will rotate
+    api_token       = "xxx" # with User.API Tokens permission
+    api_key         = "xxx"
+    api_email       = "user@example.com"
+    api_origin_key  = "xxx"
+    api_tunnel_service_key = "xxx" # or ..
+    api_tunnel_service_key_arns = ["xxxxxx"] # .. the arn takes priority
+
+    secret_prefix = "cloudflare/*"
+
+    namespace       = var.namespace
+    name            = var.name
+    stage           = var.stage
+    delimiter       = var.delimiter
+    attributes      = ["cf", "rotate"]
+    tags            = var.tags
+  }
+  ```
+
+include:
+  - "docs/terraform.md"
+
+# Contributors to this project
+contributors:
+  - name: "Abel Luck"
+    gitlab: "abelxluck"
+    gravatar: 0f605397e0ead93a68e1be26dc26481a

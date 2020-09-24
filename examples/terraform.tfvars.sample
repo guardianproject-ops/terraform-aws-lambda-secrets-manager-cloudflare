@@ -1,0 +1,7 @@
+api_token              = ""
+api_email              = ""
+api_key                = ""
+api_origin_key         = "v1.0-xxx"
+api_tunnel_service_key = "v1.0-xxx"
+zone_id                = ""
+hostname               = "foo.example.com"
