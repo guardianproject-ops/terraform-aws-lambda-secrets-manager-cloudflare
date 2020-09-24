@@ -14,7 +14,10 @@ build:
 
 clean:
 	rm -rf package
-	rm -rf $(ARTIFACTS)
+	rm -rf __pycache__
+
+dist-clean: clean
+	rm -rf venv
 
 fmt:
 	black $(SOURCES)

@@ -35,12 +35,6 @@ variable "api_tunnel_service_key_arns" {
   description = "A list of AWS SM Secrets containing argo tunnel service keys that this lambda could use to generate argo tunnel tokens"
 }
 
-variable "build_number" {
-  type        = string
-  description = "Any time this value changes, the lambda will be rebuilt from source. The value it self has no meaning."
-  default     = "0"
-}
-
 variable "cloudwatch_log_group_arn" {
   type        = string
   description = "The ARN of the cloudwatch log group this lambda will log to"

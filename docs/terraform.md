@@ -2,9 +2,7 @@
 
 | Name | Version |
 |------|---------|
-| archive | ~> 1.3.0 |
 | aws | ~> 2.0 |
-| null | n/a |
 
 ## Inputs
 
@@ -18,7 +16,6 @@
 | api\_tunnel\_service\_key | A single argo tunnel service key to use to generate argo tunnel tokens | `string` | `""` | no |
 | api\_tunnel\_service\_key\_arns | A list of AWS SM Secrets containing argo tunnel service keys that this lambda could use to generate argo tunnel tokens | `list(string)` | `[]` | no |
 | attributes | Additional attributes (e.g. `1`) | `list(string)` | `[]` | no |
-| build\_number | Any time this value changes, the lambda will be rebuilt from source. The value it self has no meaning. | `string` | `"0"` | no |
 | cloudtrail\_log\_group\_name | The ARN of the log group cloudtrail events are sent to ( used when creating cloudwatch log metric ) | `string` | `""` | no |
 | cloudwatch\_log\_group\_arn | The ARN of the cloudwatch log group this lambda will log to | `string` | n/a | yes |
 | cloudwatch\_metric\_name | The name of the cloudwatch metric | `string` | `"FailedRotations"` | no |
@@ -43,5 +40,5 @@
 |------|-------------|
 | cloudwatch\_metric\_name | n/a |
 | cloudwatch\_metric\_namespace | n/a |
-| lambda | the lambda resource output |
+| lambda | n/a |
 

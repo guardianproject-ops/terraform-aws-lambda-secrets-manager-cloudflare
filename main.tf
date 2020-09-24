@@ -1,42 +1,8 @@
 data "aws_caller_identity" "current" {}
 data "aws_region" "current" {}
 
-resource "null_resource" "lambda" {
-  triggers = {
-    build_number = var.build_number
-  }
-  provisioner "local-exec" {
-    command = "cd ${path.module} && make artifact"
-  }
-}
-
-data "archive_file" "lambda_zip" {
-  type        = "zip"
-  source_dir  = "${path.module}/artifacts/lambda"
-  output_path = "${path.module}/artifacts/lambda-${null_resource.lambda.triggers.build_number}.zip"
-  depends_on  = [null_resource.lambda]
-}
-
-data "aws_iam_policy_document" "assume" {
-  statement {
-    effect = "Allow"
-
-    principals {
-      type        = "Service"
-      identifiers = ["lambda.amazonaws.com"]
-    }
-
-    actions = [
-      "sts:AssumeRole"
-    ]
-  }
-}
-
-resource "aws_iam_role" "lambda" {
-  name               = module.this.id
-  assume_role_policy = data.aws_iam_policy_document.assume.json
-  tags               = module.this.tags
-}
+#########################################################################################
+# IAM resources
 
 data "aws_iam_policy_document" "lambda" {
   statement {
@@ -55,7 +21,7 @@ data "aws_iam_policy_document" "lambda" {
     condition {
       test     = "StringEquals"
       variable = "secretsmanager:resource/AllowRotationLambdaArn"
-      values   = [aws_lambda_function.default.arn]
+      values   = [module.lambda.function_arn]
 
     }
   }
@@ -90,7 +56,7 @@ resource "aws_iam_policy" "lambda" {
 }
 
 resource "aws_iam_role_policy_attachment" "lambda" {
-  role       = aws_iam_role.lambda.name
+  role       = module.lambda.role_name
   policy_arn = aws_iam_policy.lambda.arn
 }
 
@@ -100,30 +66,32 @@ resource "aws_iam_policy" "other_secrets" {
   description = "Allow secret read access to other secrets"
   policy      = data.aws_iam_policy_document.other_secrets.json
 }
-
 resource "aws_iam_role_policy_attachment" "other_secrets" {
-  count = length(var.api_tunnel_service_key_arns) > 0 ? 1 : 0
-
-  role       = aws_iam_role.lambda.name
+  count      = length(var.api_tunnel_service_key_arns) > 0 ? 1 : 0
+  role       = module.lambda.role_name
   policy_arn = aws_iam_policy.other_secrets[0].arn
 }
 
-resource "aws_iam_role_policy_attachment" "lambda_eni" {
-  role       = aws_iam_role.lambda.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaENIManagementAccess"
-}
+#########################################################################################
+# Lambda resources
 
-resource "aws_lambda_function" "default" {
-  function_name    = module.this.id
-  filename         = data.archive_file.lambda_zip.output_path
-  handler          = "rotate.lambda_handler"
-  role             = aws_iam_role.lambda.arn
-  source_code_hash = data.archive_file.lambda_zip.output_base64sha256
-  runtime          = "python3.7"
-  timeout          = 300
-  tags             = module.this.tags
+module "lambda" {
+  source = "git::https://github.com/claranet/terraform-aws-lambda.git?ref=tags/v1.2.0"
 
-  environment {
+  function_name = module.this.id
+  description   = "Rotates Cloudflare secrets via AWS SecretsManager"
+  handler       = "rotate.lambda_handler"
+  runtime       = "python3.7"
+  timeout       = 300
+
+  // Specify a file or directory for the source code.
+  source_path = "${path.module}/lambda/"
+
+  // Add additional trusted entities for assuming roles (trust relationships).
+  trusted_entities = ["secretsmanager.amazonaws.com"]
+
+  // Add environment variables.
+  environment = {
     variables = {
       CF_API_TOKEN          = var.api_token
       CF_API_KEY            = var.api_key
@@ -132,20 +100,22 @@ resource "aws_lambda_function" "default" {
       CF_TUNNEL_SERVICE_KEY = var.api_tunnel_service_key
     }
   }
-}
 
-resource "aws_lambda_permission" "secretsmanager" {
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.default.function_name
-  principal     = "secretsmanager.amazonaws.com"
-  statement_id  = "AllowExecutionFromSecretsManager1"
+  tags = module.this.tags
 }
 
 resource "aws_lambda_alias" "default" {
   name             = "default"
   description      = "Use latest version as default"
-  function_name    = aws_lambda_function.default.function_name
+  function_name    = module.lambda.function_name
   function_version = "$LATEST"
+}
+
+resource "aws_lambda_permission" "secretsmanager" {
+  action        = "lambda:InvokeFunction"
+  function_name = module.lambda.function_name
+  principal     = "secretsmanager.amazonaws.com"
+  statement_id  = "AllowExecutionFromSecretsManager1"
 }
 
 

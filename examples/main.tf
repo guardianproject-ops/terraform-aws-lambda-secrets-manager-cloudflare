@@ -31,13 +31,13 @@ module "cf_rotate" {
 #############################################################################
 # Cloudflare API Token
 resource "aws_secretsmanager_secret" "cf_dns_token" {
-  name = "${module.this.id}/cloudflare/dns_api_token3"
+  name = "${module.this.id}/cloudflare/dns_api_token4"
   tags = module.this.tags
 }
 
 resource "aws_secretsmanager_secret_rotation" "cf_dns_token" {
   secret_id           = aws_secretsmanager_secret.cf_dns_token.id
-  rotation_lambda_arn = module.cf_rotate.lambda.arn
+  rotation_lambda_arn = module.cf_rotate.lambda.function_arn
 
   rotation_rules {
     automatically_after_days = 1
@@ -65,13 +65,13 @@ resource "aws_secretsmanager_secret_version" "cf_dns_token" {
 # Cloudflare Tunnel Service key
 
 resource "aws_secretsmanager_secret" "cf_tunnel_service_key" {
-  name = "${module.this.id}/cloudflare/tunnel_service_key3"
+  name = "${module.this.id}/cloudflare/tunnel_service_key4"
   tags = module.this.tags
 }
 
 resource "aws_secretsmanager_secret_rotation" "cf_tunnel_service_key" {
   secret_id           = aws_secretsmanager_secret.cf_tunnel_service_key.id
-  rotation_lambda_arn = module.cf_rotate.lambda.arn
+  rotation_lambda_arn = module.cf_rotate.lambda.function_arn
 
   rotation_rules {
     automatically_after_days = 1
@@ -92,13 +92,13 @@ resource "aws_secretsmanager_secret_version" "cf_tunnel_service_key" {
 # Cloudflare Argo Tunnel Token
 
 resource "aws_secretsmanager_secret" "cf_argo_tunnel_token" {
-  name = "${module.this.id}/cloudflare/argo_tunnel_token3"
+  name = "${module.this.id}/cloudflare/argo_tunnel_token4"
   tags = module.this.tags
 }
 
 resource "aws_secretsmanager_secret_rotation" "cf_argo_tunnel_token" {
   secret_id           = aws_secretsmanager_secret.cf_argo_tunnel_token.id
-  rotation_lambda_arn = module.cf_rotate.lambda.arn
+  rotation_lambda_arn = module.cf_rotate.lambda.function_arn
 
   rotation_rules {
     automatically_after_days = 1
